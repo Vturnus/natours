@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const AppError = require('../starter/ultis/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -22,7 +23,7 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-// 1) GLOBAL MIDDLERWARES
+// 1) GLOBAL MIDDLEWARES
 
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -57,16 +58,17 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 // Data santization against XSS
 app.use(xssClean());
-// Prevent parameter polution
+// Prevent parameter pollution
 app.use(hpp({
   whitelist: [
     'duration', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'difficulty', 'price'
   ]
 }));
 
+app.use(compression());
 // Test middleware
 app.use((req, res, next) => {
-  console.log('Hello from the middleware 👋');
+  // console.log('Hello from the middleware 👋');
   next();
 });
 
