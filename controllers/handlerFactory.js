@@ -1,6 +1,6 @@
-const catchAsync = require('../ultis/catchAsync');
-const AppError = require('../ultis/appError');
-const APIFeatures = require('../ultis/apiFeatures');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.deleteOne = Model => catchAsync(async (req, res, next) => {
 

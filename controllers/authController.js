@@ -4,9 +4,9 @@ const {
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const AppError = require('../ultis/appError');
-const catchAsync = require('../ultis/catchAsync');
-const Email = require('../ultis/email');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
+const Email = require('../utils/email');
 
 const signToken = id => {
   return jwt.sign({
