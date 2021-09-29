@@ -1,7 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
-const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 const User = require('../models/userModel');
@@ -33,8 +32,8 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         session
-    })
-})
+    });
+});
 
 // exports.createBookingCheckout = catchAsync(async (req, res, next) => {
 //     // This is only temporary because it's unsecure because everyone can make booking without paying!!!
@@ -50,25 +49,39 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
 const createBookingCheckout = async session => {
     const tour = session.client_reference_id;
-    const user = (await User.findOne({ email: session.customer_email })).id;
+    const user = (await User.findOne({
+        email: session.customer_email
+    })).id;
     const price = session.line_items[0].amount / 100;
-    await Booking.create({ tour, user, price })
-}
+    await Booking.create({
+        tour,
+        user,
+        price
+    })
+    console.log('tour to save: ', tour, 'User: ', user, 'price: ', price);
+};
 
 exports.webhookCheckout = (req, res, next) => {
+    console.log('Hello from webhookCheckout')
     const signature = req.headers['stripe-signature'];
+    console.log('signatre: ', signature)
     let event;
     try {
         event = stripe.webhooks.constructEvent(req.body, signature, process.env.STRIPE_WEBHOOK_SECRET)
     } catch (err) {
         return res.status(400).send(`Webhook error: ${err.message}`);
     }
+    console.log('event type: ', event.type)
 
     if (event.type === 'checkout.session.completed') {
+        console.log(' event fired, and event type is: ', event.type)
         createBookingCheckout(event.data.object);
     }
 
-    res.status(200).json({ received: true });
+
+    res.status(200).json({
+        received: true
+    });
 };
 
 exports.createBooking = factory.createOne(Booking);
