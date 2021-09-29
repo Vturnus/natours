@@ -48,6 +48,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // })
 
 const createBookingCheckout = async session => {
+    console.log('Session in CBC: ', session)
     const tour = session.client_reference_id;
     const user = (await User.findOne({
         email: session.customer_email
@@ -62,19 +63,16 @@ const createBookingCheckout = async session => {
 };
 
 exports.webhookCheckout = (req, res, next) => {
-    console.log('Hello from webhookCheckout')
     const signature = req.headers['stripe-signature'];
-    console.log('signatre: ', signature)
     let event;
     try {
         event = stripe.webhooks.constructEvent(req.body, signature, process.env.STRIPE_WEBHOOK_SECRET)
     } catch (err) {
         return res.status(400).send(`Webhook error: ${err.message}`);
     }
-    console.log('event type: ', event.type)
 
     if (event.type === 'checkout.session.completed') {
-        console.log(' event fired, and event type is: ', event.type)
+        console.log(' event fired, and event type is: ', event.data)
         createBookingCheckout(event.data.object);
     }
 
