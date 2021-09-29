@@ -48,7 +48,6 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // })
 
 const createBookingCheckout = async session => {
-    console.log('Session in CBC: ', session)
     const tour = session.client_reference_id;
     const user = (await User.findOne({
         email: session.customer_email
@@ -59,7 +58,6 @@ const createBookingCheckout = async session => {
         user,
         price
     })
-    console.log('tour to save: ', tour, 'User: ', user, 'price: ', price);
 };
 
 exports.webhookCheckout = (req, res, next) => {
